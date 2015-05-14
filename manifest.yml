@@ -1,0 +1,10 @@
+---
+applications:
+- name: email-2-sms-node
+  memory: 512M
+  host: email-2-sms-node
+  domain: mybluemix.net
+  env: {
+    }
+  services: {
+    }

@@ -1,0 +1,549 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  <title>Home</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="1024" />
+  <meta name="viewport" content="width=1024, height=device-height, maximum-scale=1" />
+  <meta id="meta-keywords" name="keywords" content=""/>
+  <meta id="meta-description" name="description" content="default description"/>
+  <link rel="shortcut icon" href="//static.websitebuilder.com/_websitebuilder/img/icons/favicon.ico?050904" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="//static.websitebuilder.com/_websitebuilder/img/icons/apple-touch-icon.png?050904" />
+  <link rel="apple-touch-icon" sizes="57x57" href="//static.websitebuilder.com/_websitebuilder/img/icons/apple-touch-icon-57x57.png?050904">
+  <link rel="apple-touch-icon" sizes="60x60" href="//static.websitebuilder.com/_websitebuilder/img/icons/apple-touch-icon-60x60.png?050904">
+  <link rel="apple-touch-icon" sizes="72x72" href="//static.websitebuilder.com/_websitebuilder/img/icons/apple-touch-icon-72x72.png?050904">
+  <link rel="apple-touch-icon" sizes="114x114" href="//static.websitebuilder.com/_websitebuilder/img/icons/apple-touch-icon-114x114.png?050904">
+  <link rel="apple-touch-icon" sizes="120x120" href="//static.websitebuilder.com/_websitebuilder/img/icons/apple-touch-icon-120x120.png?050904">
+  <link rel="apple-touch-icon" sizes="144x144" href="//static.websitebuilder.com/_websitebuilder/img/icons/apple-touch-icon-144x144.png?050904">
+  <link rel="apple-touch-icon" sizes="152x152" href="//static.websitebuilder.com/_websitebuilder/img/icons/apple-touch-icon-152x152.png?050904">
+  <meta name="msapplication-square70x70logo" content="//static.websitebuilder.com/_websitebuilder/img/icons/smalltile.png?050904" />
+  <meta name="msapplication-square150x150logo" content="//static.websitebuilder.com/_websitebuilder/img/icons/mediumtile.png?050904" />
+  <meta name="msapplication-wide310x150logo" content="//static.websitebuilder.com/_websitebuilder/img/icons/widetile.png?050904" />
+  <meta name="msapplication-square310x310logo" content="//static.websitebuilder.com/_websitebuilder/img/icons/largetile.png?050904" />
+  <link rel="stylesheet" type="text/css" href="//az388832.vo.msecnd.net/201504291434057002/designer-and-viewer-website-builder/viewer-prod.css"/>
+  <link rel="stylesheet" type="text/css" id="theme" href="/bootstrap.min.css"/>
+  <link rel="stylesheet" type="text/css" id="theme" href="/bootstrap.css"/>
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+   <script type='text/javascript' src='/bootstrap.js'></script>
+   <script type='text/javascript' src='/angular.js'></script>
+   <script type='text/javascript' src='/bootstrap.min.js'></script>
+   <script type='text/javascript'>
+
+var app = angular.module('myApp', []);
+
+function isValidateEmail(email) {
+		    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+		    return re.test(email);
+		}
+		
+
+
+app.controller('myCtrl', function($scope,$http) {
+
+$scope.filterlist = [];
+$scope.blockedlist = [];
+$scope.requiredlist = [];
+    
+    var filterlist = [];
+    var blockedlist = [];
+    var blockedlist = [];
+    
+    $http.get("/getservices/"+localStorage.getItem("clientunkid")).
+  	success(function(response, status, headers, config) {
+    	filterlist =  (response.data[0].filter != null)?((response.data[0].filter).split("<--sep-->")):[];
+		blockedlist =  (response.data[0].blocked_email != null)?((response.data[0].blocked_email).split("<--sep-->")):[];
+		requiredlist =  (response.data[0].required_email != null)?((response.data[0].required_email).split("<--sep-->")):[];
+		
+		
+		$(filterlist).each(function(idx,filtertext){
+			$scope.filterlist.push({filter:filtertext});
+		});
+		$(blockedlist).each(function(idx,blockedtext){
+			$scope.blockedlist.push({blocked:blockedtext});
+		});
+		$(requiredlist).each(function(idx,requiredtext){
+			$scope.requiredlist.push({required:requiredtext});
+		});
+		
+  	});  
+  	
+  	 $scope.editKeywords = function(obj){
+			 $("#divKeywordShow").hide();
+			 $("#divKeywordEdit").show();
+		 };
+		 
+	 $scope.saveKeywords = function(obj){
+	 	var tempfilter = [];
+		 $($scope.filterlist).each(function(key,fltr){
+		 	tempfilter.push(fltr.filter); 
+		 });
+		 var filterStr = tempfilter.join("<--sep-->");
+		
+		 $http.post('/savekeywords', {filter: filterStr,"clientunkid": localStorage.getItem("clientunkid")}).
+		  success(function(data, status, headers, config) {
+			  	$("#divKeywordShow").show();
+				$("#divKeywordEdit").hide();
+		  });
+	 };
+	
+	$scope.cancelKeywords = function(obj){	
+		 	$scope.filtertext = "";
+		 	$("#divKeywordShow").show();
+			$("#divKeywordEdit").hide();
+	};
+	 
+  	$scope.addKeyword = function(){
+  		$scope.filterlist.push({filter:$scope.filtertext});
+  		$scope.filtertext = "";
+  	};
+  	 $scope.removeKeyword = function(obj){
+		 
+		 deleteKeyword = (obj.filter.filter);
+		
+			 console.log(deleteKeyword);
+			 ///
+			 angular.forEach($scope.filterlist, function(value, key) {
+			 console.log(value);
+			 console.log(key);
+				  if(value.filter == deleteKeyword){
+					  console.log("key:: "+key);
+					  delete $scope.filterlist[key];
+					  $scope.filterlist.splice(key,1);
+				  }
+			});
+	};
+		
+  	
+  	
+  	$scope.editBlocked = function(obj){
+			 $("#divBlockedShow").hide();
+			 $("#divBlockedEdit").show();
+		 };
+		 
+	 $scope.saveBlocked = function(obj){
+	 	var tempblocked = [];
+		 $($scope.blockedlist).each(function(key,blk){
+		 	tempblocked.push(blk.blocked); 
+		 });
+		 var blockedStr = tempblocked.join("<--sep-->");
+		
+		 $http.post('/saveblockedemail', {blocked: blockedStr,"clientunkid": localStorage.getItem("clientunkid")}).
+		  success(function(data, status, headers, config) {
+			  	$("#divBlockedShow").show();
+				$("#divBlockedEdit").hide();
+		  });
+	 };
+	$scope.cancelBlocked = function(obj){	
+		 	$scope.blockedtext = "";
+		 	$("#divBlockedShow").show();
+			$("#divBlockedEdit").hide();
+	};
+	
+  	$scope.addBlocked = function(){
+  	
+	  	 if(!(isValidateEmail($scope.blockedtext))){
+	  	 	alert("Invalid Email");
+	  	 }
+	  	 else{
+	  		$scope.blockedlist.push({blocked:$scope.blockedtext});
+	  		$scope.blockedtext = "";
+	  	}
+  	};
+  	
+  	 $scope.removeBlocked = function(obj){
+		 
+		 deleteBlocked = (obj.blocked.blocked);
+		
+			 console.log(deleteBlocked);
+			 ///
+			 angular.forEach($scope.blockedlist, function(value, key) {
+			 console.log(value);
+			 console.log(key);
+				  if(value.blocked == deleteBlocked){
+					  console.log("key:: "+key);
+					  delete $scope.blockedlist[key];
+					  $scope.blockedlist.splice(key,1);
+				  }
+			});
+	 };
+	 
+  	$scope.editRequired = function(obj){
+			 $("#divRequiredShow").hide();
+			 $("#divRequiredEdit").show();
+		 };
+		 
+	 $scope.saveRequired = function(obj){
+	 	var temprequired = [];
+	 	console.log($scope.requiredlist);
+		 $($scope.requiredlist).each(function(key,reqd){
+		 	if(reqd.required != "" && reqd.required != null && reqd.required != "undefined")
+		 		temprequired.push(reqd.required); 
+		 });
+		 var requiredStr = temprequired.join("<--sep-->");
+		
+		 $http.post('/saverequiredemail', {required: requiredStr,"clientunkid": localStorage.getItem("clientunkid")}).
+		  success(function(data, status, headers, config) {
+			  	$("#divRequiredShow").show();
+				$("#divRequiredEdit").hide();
+		  });
+	 };
+	 
+	 $scope.cancelRequired = function(obj){	
+		 	$scope.requiredtext = "";
+		 	$("#divRequiredShow").show();
+			$("#divRequiredEdit").hide();
+	};
+		 
+  	$scope.addRequired = function(){
+  		 if(!(isValidateEmail($scope.requiredtext))){
+	  	 	alert("Invalid Email");
+	  	 }
+	  	 else{
+	  		$scope.requiredlist.push({required:$scope.requiredtext});
+	  		$scope.requiredtext = "";
+	  	}
+  	};
+  	
+  	 $scope.removeRequired = function(obj){
+		 
+		 deleteRequired = (obj.required.required);
+		
+			 console.log(deleteRequired);
+			 ///
+			 angular.forEach($scope.requiredlist, function(value, key) {
+			 console.log(value);
+			 console.log(key);
+				  if(value.required == deleteRequired){
+					  console.log("key:: "+key);
+					  delete $scope.requiredlist[key];
+					  $scope.requiredlist.splice(key,1);
+				  }
+			});
+	 };
+});
+
+ 
+  
+  
+  function saveSettings(){
+
+$.ajax({
+  url: "/settings",
+  type: "post",
+  data: {
+  			"txtKeyword":$("#txtKeyword").val(),
+  			"txtBlockedEmail":$("#txtBlockedEmail").val(),
+  			"txtRequiredEmail":$("#txtRequiredEmail").val(),
+  		}
+}).success(function(data) {
+  
+  console.log(data);
+});
+
+
+}
+
+var PageData = {"baseAddress":"http://email-2-sms.my-free.website","customAppVersion":null,"ServicesBasePath":"","siteSettings":{"doneFirstPublish":"true","enableColumnsGrid":"false","showAlwaysColumnsGrid":"false"},"isNewServer":true,"defaultAjaxPageID":"id1422275140507","dynamicPageInformation":null};
+var Global = {"IsDesigner":false,"FacebookAppID":"118042221602043","FacebookChannelFileLocation":"http://email-2-sms.my-free.website:80/channel.html","IsMobile":false,"IsMobileView":false,"IsMobileClient":false,"SiteID":40031130,"IsNewStructure":true};
+var SiteInformation =  {"limitations":{"video":{"limitation":{"isLimited":true}},"pages":{"limitation":{"isLimited":false}},"ecommerce":{"limitation":{"isLimited":true}},"publish":{"limitation":{"isLimited":false}},"stats":{"limitation":{"isLimited":true}},"storage":{"limitation":{"isLimited":false}},"file":{"limitation":{"isLimited":false}},"premium":{"limitation":{"isLimited":true}},"mobile":{"limitation":{"isLimited":true}},"newSites":{"limitation":{"isLimited":false}},"favicon":{"limitation":{"isLimited":true}},"embedded":{"limitation":{"isLimited":true}},"bannerFeature":{"iframeUrl":"http://iframe.websitebuilder.com/editor/adBanner","iframeHeight":"66px","limitation":{"isLimited":true}}},"isPremium":false,"groupId":40031130};
+var Settings = {"IsNewServer":true,"UserStorageUrlsMap":{"1":"users/{0}/","2":"http://wzukusers.blob.core.windows.net/user-{0}/","6":"http://storage.googleapis.com/wzukusers/user-{0}/","61":"http://storage.googleapis.com/wzukusers/user-{0}/"},"WebzaiStorageUrlsMap":{"1":"assets/","2":"http://wzuk.blob.core.windows.net/assets/","6":"http://storage.googleapis.com/wzuk/assets/","61":"http://storage.googleapis.com/wzuk/assets/"},"StaticContentUrl":"http://webzaidev.blob.core.windows.net/","ServiceAddress":"http://editor.webzai.dev/","ApplicationRoot":"//az388832.vo.msecnd.net/201504291434057002","Brand":3,"ApplicationDomain":"websitebuilder.com"};
+
+var ga = undefined; var _gaq = undefined;
+</script>
+  <script src='//az388832.vo.msecnd.net/201504291434057002/designer-and-viewer-website-builder/viewer-prod-templates.js' type='text/javascript'></script>
+  <script src='//az388832.vo.msecnd.net/201504291434057002/designer-and-viewer-website-builder/viewer-prod.js' type='text/javascript'></script>
+  <script src='http://storage.googleapis.com/wzukusers/user-13062145/sites/40031130/554ac69d49c92RAqw4de/554d1bcf02913n3WJH3x.js' type='text/javascript'></script>
+  <script type='text/javascript'>
+var SiteFilesMap = {"page-id1422275140507":"http://storage.googleapis.com/wzukusers/user-13062145/sites/40031130/554ac69d49c92RAqw4de/a9CJmESaPQ9qv09Zm7H3.js","page-id1422281777045":"http://storage.googleapis.com/wzukusers/user-13062145/sites/40031130/554ac69d49c92RAqw4de/imQ30rUsVtx5C9OYOG8E.js","page-id1422346267892":"http://storage.googleapis.com/wzukusers/user-13062145/sites/40031130/554ac69d49c92RAqw4de/wi42jd1GlIKE5AI51CxW.js","page-id1422349783026":"http://storage.googleapis.com/wzukusers/user-13062145/sites/40031130/554ac69d49c92RAqw4de/542HeRG2xPG48L6rZ88l.js","master-1343569893636":"http://storage.googleapis.com/wzukusers/user-13062145/sites/40031130/554ac69d49c92RAqw4de/RSZWsH2ukzqpEt7TkOVS.js","site-structure":"http://storage.googleapis.com/wzukusers/user-13062145/sites/40031130/554ac69d49c92RAqw4de/554d1bcf02913n3WJH3x.js"};</script>
+  <script type="text/javascript">
+  
+  function register(){
+
+}
+
+    var DynamicPageElements = null;
+    var DBSiteMetaData = {
+      'pagesStructureInformation':{
+        'pagesData':{"id1422275140507":{"metaTags":"","tags":[],"id":"id1422275140507","title":"Home","pageTitle":"","description":"default description","keyWords":"","index":1,"isHomePage":true,"urlAlias":"","useNameASUrl":false,"supportsMobileStates":true,"shareStyle":true,"useDefaultTitle":false},"id1422281777045":{"metaTags":"","tags":[],"id":"id1422281777045","title":"Settings","pageTitle":"","description":"default description","keyWords":"","index":3,"isHomePage":false,"urlAlias":"settings","useNameASUrl":true,"supportsMobileStates":true,"shareStyle":true,"useDefaultTitle":false},"id1422346267892":{"metaTags":"","tags":[],"id":"id1422346267892","title":"Services","pageTitle":"","description":"","keyWords":"","index":2,"isHomePage":false,"urlAlias":"services","useNameASUrl":true,"supportsMobileStates":true,"shareStyle":true,"useDefaultTitle":false},"id1422349783026":{"metaTags":"","tags":[],"id":"id1422349783026","title":"Contact","pageTitle":"","description":"","keyWords":"","index":4,"isHomePage":false,"urlAlias":"contact","useNameASUrl":true,"supportsMobileStates":true,"shareStyle":true}},
+        'pagesHierarchies':{}      },
+      'siteStructureInformation':{
+        'masterPages': {"1343569893636":{"pagesIDs":["id1422275140507","id1422281777045","id1422346267892","id1422349783026"]}},
+        'listsInformation':{}      }
+    };
+
+
+
+  //  Viewer.initialize();
+  </script>
+  </head>
+  
+<div style="position: absolute; visibility: hidden; top: -200px; left: -100000px; width: 100000px; height: 200px; font-size: 100px;" id="fontdetectHelper"><span style="font-family: Questrial,fantasy;">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</span></div>
+<div class="body-element-container">
+    <div class="body-element-wrapper">
+    <div class="standard-layout view-mode" id="body-element">
+        <div id="offset-anchor"></div>
+        <div class="design-element element-size-box coordinator-element">
+        <div class="element-main-box design-element-main-box coordinator-element">
+            <div class="element-background-layer element-border-target design-element-background-layer coordinator-element"></div>
+            <div class="element-border-box element-border-target element-padding-box design-element-border-box coordinator-element">
+            <div class="element-content-box design-element-content-box coordinator-element">
+                <div class="content-container content-container-type element-size-box coordinator-element"></div>
+              </div>
+          </div>
+          </div>
+      </div>
+        <div class="design-element page-element">
+        <div class="element-main-box positioned">
+            <div style="background-color: rgb(255, 255, 255);" class="element-background-layer positioned absolute-fill element-border-target design-element-border-target fixed-attachment-background"></div>
+            <div class="element-background-image state-displayed image-box-new optimize-speed state-no-image fixed-attachment-background"><span style="width: 1351px; height: 1394px;" class="image-box-image-wrapper block horizontal-left vertical-top normal"></span></div>
+            <div style="border-color: Black;" class="page-element-border-box element-border-target positioned design-element-border-box">
+            <div class="header-section page-section positioned">
+                <div style="left: 0px; right: 0px; top: 0px;" class="design-element element-size-box header-element section-element first-section is-page-child">
+                <section class="html-element">
+                    <div class="element-main-box design-element-main-box header-element">
+                    <div style="background-color: rgb(255, 255, 255);" class="element-background-layer element-border-target design-element-background-layer header-element"></div>
+                    <div style="padding: 0px; border-color: Black; border-style: solid;" class="element-border-box element-border-target element-padding-box design-element-border-box header-element">
+                        <div class="element-content-box design-element-content-box header-element">
+                        <div style="min-height: 57px;" class="content-container content-container-type element-size-box header-element section-element-size-box">
+                            <div class="absolute-fill element-content"></div>
+                            <div style="left: 50%; top: 0px; margin-left: -416px; z-index: 5;" class="design-element element-size-box  has-text is-section-child">
+                            <div style="transition: none 0s ease 0s ; z-index: 5;" class="element-main-box design-element-main-box ">
+                                <div style="background-color: rgba(255, 255, 255, 0);" class="element-background-layer element-border-target design-element-background-layer "></div>
+                                <div style="padding: 0px; border-color: Black; border-style: solid;" class="element-border-box element-border-target element-padding-box design-element-border-box ">
+                                <div class="element-content-box design-element-content-box ">
+                                    <div style="width: 238px; min-height: 56px;" class="content-container content-container-type element-size-box ">
+                                    <div class="rich-text-element-content absolute-fill element-content dir-ltr" style="background: none repeat scroll 0% 0% transparent; text-align: left; font-family: Questrial; font-size: 24px; transition: none 0s ease 0s ; color: rgb(0, 0, 0); text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.35); line-height: 1.2; letter-spacing: 0px;">
+                                        <div style="margin-top: -14.5px;" class="rich-text-positioning-wrapper vertical-alignment-center">
+                                        <div class="rich-text-content">
+                                            <div><span style="font-family:trade winds;"><span style="letter-spacing:4px;"><span class="theme-text-color-4-2">Email-2-SMS</span></span></span></div>
+                                          </div>
+                                      </div>
+                                      </div>
+                                  </div>
+                                  </div>
+                              </div>
+                              </div>
+                          </div>
+                            <div style="left: 50%; top: 0px; margin-left: -65px; z-index: 11;" class="design-element element-size-box menu-element is-section-child">
+                            <nav class="html-element">
+                                <div style="z-index: 11;" class="element-main-box design-element-main-box menu-element">
+                                <div style="background-color: rgba(255, 255, 255, 0);" class="element-background-layer element-border-target design-element-background-layer menu-element"></div>
+                                <div style="padding: 0px; border-color: Black; border-style: solid;" class="element-border-box element-border-target element-padding-box design-element-border-box menu-element">
+                                    <div class="element-content-box design-element-content-box menu-element">
+                                    <div style="width: 434px; min-height: 55px;" class="content-container content-container-type element-size-box menu-element">
+                                        <div class="content-holder absolute-fill element-content">
+                                        <div class="arrangement-content-holder absolute-fill forwardLayerEvents"><span class="inline-block relative-arrangement wrap"><span style="width: 101px; height: 55px; margin-left: 0px;" class="inline-block instance-container">
+                                          <div style="left: 0px; right: 0px;" class="design-element element-size-box skin-menu-button-element skin-element data-list-item catchLayerEvents webzai-clickable-behaviour">
+                                          <a href="/home" class="design-element-link-part no-decorations internal-link">
+                                            Home
+                                            </a></div>
+                                          </span><span style="width: 101px; height: 55px; margin-left: 10px;" class="inline-block instance-container">
+                                          <div style="left: 0px; right: 0px;" class="design-element element-size-box skin-menu-button-element skin-element data-list-item catchLayerEvents webzai-clickable-behaviour">
+	                                          <a href="/services" class="design-element-link-part no-decorations internal-link">
+	                                            Services
+	                                           </a>
+                                           </div>
+                                          </span><span style="width: 101px; height: 55px; margin-left: 10px;" class="inline-block instance-container">
+                                          <div style="left: 0px; right: 0px;" class="design-element element-size-box skin-menu-button-element skin-element data-list-item catchLayerEvents webzai-clickable-behaviour">
+                                          	<a href="/settings" class="design-element-link-part no-decorations internal-link">
+                                            Settings
+                                            </a>
+                                           </div>
+                                          </span><span style="width: 101px; height: 55px; margin-left: 10px;" class="inline-block instance-container">
+                                          <div style="left: 0px; right: 0px;" class="design-element element-size-box skin-menu-button-element skin-element data-list-item catchLayerEvents webzai-clickable-behaviour">
+                                          	<a href="/contact" class="design-element-link-part no-decorations internal-link">
+                                            Contact
+                                            </a></div>
+                                            <div style="left: 90px; right: 0px;" class="design-element element-size-box skin-menu-button-element skin-element data-list-item catchLayerEvents webzai-clickable-behaviour">
+                                          	<a href="/home" class="design-element-link-part no-decorations internal-link">
+                                            Logout
+                                            </a></div>
+                                          </span></span></div>
+                                      </div>
+                                      </div>
+                                  </div>
+                                  </div>
+                              </div>
+                              </nav>
+                          </div>
+                          </div>
+                      </div>
+                      </div>
+                  </div>
+                  </section>
+              </div>
+              </div>
+            <div style="min-height: 5px;" class="page-element-size-box element-size-box positioned"><div class="page-content-container content-container-type"><div class="page-element element-content">
+        <div style="margin: 0px;background:url('/banner.jpg');background-size:cover;min-height:550px;" class="design-element positioned page-content-element block-element is-page-child">
+       	<div ng-app="myApp" ng-controller="myCtrl"> 
+       	<div class="media last" id="divKeywords">
+				<h3 class="">
+					<div role="alert" class="" style="font-weight: bold; font-size: 30px; padding: 20px;">
+						Keywords
+						<button ng-click="editKeywords()" class="btn btn-primary" style="margin-left:35%">
+							<i class="glyphicon glyphicon-pencil"></i>
+						</button>
+					</div>
+					
+				</h3>
+	  			<div class="media-body panel panel-body" id="divKeywordShow" style="background:none;">
+	  			
+		  			<ul class="list-group" style="border:1px solid #cccccc;width:50%">
+					  <li class="list-group-item" ng-repeat="filter in filterlist" ng-if="filter.filter != '' && filter.filter != 'undefined' && filter.filter != null">{{filter.filter}}</li>
+					</ul>
+		  			
+					<!-- 
+					<div class="container-fluid">
+						<div class="col-md-7" style="padding:10px; margin-top:20px;">
+						 <span ng-repeat="filter in filter">
+							<div  ng-if="filter.filter != '' && filter.filter != 'undefined' && filter.filter != null">
+								<button><span>{{filter.filter}}</span></button>
+							</div>
+						</span>
+						</div>
+					</div>
+					-->
+					
+	    		</div>
+	    		<div class="media-body" id="divKeywordEdit" style="display:none">
+		  			<div class="container-fluid">
+		  				<div class="input-group col-md-4">
+					  		<input class="form-control" type="text" name="txtKeywords" ng-model="filtertext" placeholder="Keywords">
+					  		<span class="input-group-addon brn btn-primary" ng-click="addKeyword()">Add</span>
+						</div>
+					</div>
+					<div class="container-fluid">
+						<div class="col-md-4" style="border:1px solid #cccccc; padding:10px; margin-top:20px;margin-bottom:50px">
+							 <span ng-repeat="filter in filterlist">
+								<span  ng-if="filter.filter != '' && filter.filter != 'undefined' && filter.filter != null">
+									<button ng-click="removeKeyword(this)"><span>{{filter.filter}}</span><span style="color:red"> x </span></button>
+								</span>
+							</span>
+						</div>
+					<div class="container-fluid" style="padding:15px;">
+						<div class="col-md-4">
+							<button class="btn btn-primary" ng-click="saveKeywords()">Save</button>
+							<button class="btn" ng-click="cancelKeywords()">Cancel</button>
+						</div>
+					</div>
+				</div>
+	    		</div>
+			</div>
+			
+			<!-- BLOCKED EMAIL START-->
+			
+			<div class="media last" id="divBlocked" style="background:none;">
+				<h3 class="">
+					<div role="alert" class="" style="font-weight: bold; font-size: 30px; padding: 20px;">
+						Block Emails
+						<button ng-click="editBlocked()" class="btn btn-primary" style="margin-left:32%">
+							<i class="glyphicon glyphicon-pencil"></i>
+						</button>
+					</div>
+					
+				</h3>
+	  			<div class="media-body panel panel-body" id="divBlockedShow" style="background:none;">
+	  			
+		  			<ul class="list-group" style="border:1px solid #cccccc; width:50%">
+					  <li class="list-group-item" ng-repeat="blocked in blockedlist" ng-if="blocked.blocked != '' && blocked.blocked != 'undefined' && blocked.blocked != null">{{blocked.blocked}}</li>
+					</ul>
+		  			
+	    		</div>
+	    		<div class="media-body" id="divBlockedEdit" style="display:none">
+		  			<div class="container-fluid">
+		  				<div class="input-group col-md-4">
+					  		<input class="form-control" type="email" name="txtBlocked" ng-model="blockedtext" placeholder="Emails to be blocked">
+					  		<span class="input-group-addon brn btn-primary" ng-click="addBlocked()">Add</span>
+						</div>
+					</div>
+					<div class="container-fluid">
+						<div class="col-md-4" style="border:1px solid #cccccc; padding:10px; margin-top:20px;margin-bottom:50px">
+							 <span ng-repeat="blocked in blockedlist">
+								<span  ng-if="blocked.blocked != '' && blocked.blocked != 'undefined' && blocked.blocked != null">
+									<button ng-click="removeBlocked(this)"><span>{{blocked.blocked}}</span><span style="color:red"> x </span></button>
+								</span>
+							</span>
+						</div>
+					<div class="container-fluid" style="padding:15px;">
+						<div class="col-md-4">
+							<button class="btn btn-primary" ng-click="saveBlocked()">Save</button>
+							<button class="btn" ng-click="cancelBlocked()">Cancel</button>
+						</div>
+					</div>
+				</div>
+	    		</div>
+			</div>
+			<!-- BLOCKED EMAIL STOP -->
+	<!-- REQUIRED EMAIL START-->
+			
+			<div class="media last" id="divRequired" style="background:none;">
+				<h3 class="">
+					<div role="alert" class="" style="font-weight: bold; font-size: 30px; padding: 20px;">
+						Required Emails
+						<button ng-click="editRequired()" class="btn btn-primary" style="margin-left:29%">
+							<i class="glyphicon glyphicon-pencil"></i>
+						</button>
+					</div>
+					
+				</h3>
+	  			<div class="media-body panel panel-body" id="divRequiredShow" style="background:none;">
+	  			
+		  			<ul class="list-group" style="border:1px solid #cccccc;width:50%">
+					  <li class="list-group-item" ng-repeat="required in requiredlist" ng-if="required.required != '' && required.required != 'undefined' && required.required != null">{{required.required}}</li>
+					</ul>
+		  			
+	    		</div>
+	    		<div class="media-body" id="divRequiredEdit" style="display:none">
+		  			<div class="container-fluid">
+		  				<div class="input-group col-md-4">
+					  		<input class="form-control" type="email" name="txtRequired" ng-model="requiredtext" placeholder="Required Email Alerts">
+					  		<span class="input-group-addon brn btn-primary" ng-click="addRequired()">Add</span>
+						</div>
+					</div>
+					<div class="container-fluid">
+						<div class="col-md-4" style="border:1px solid #cccccc; padding:10px; margin-top:20px;margin-bottom:50px">
+							 <span ng-repeat="required in requiredlist">
+								<span  ng-if="required.required != '' && required.required != 'undefined' && required.required != null">
+									<button ng-click="removeRequired(this)"><span>{{required.required}}</span><span style="color:red"> x </span></button>
+								</span>
+							</span>
+						</div>
+					<div class="container-fluid" style="padding:15px;">
+						<div class="col-md-4">
+							<button class="btn btn-primary" ng-click="saveRequired()">Save</button>
+							<button class="btn" ng-click="cancelRequired()">Cancel</button>
+						</div>
+					</div>
+				</div>
+	    		</div>
+			</div>
+			<!-- REQUIRED EMAIL STOP -->
+	  
+        </div>
+        </div>
+       
+            <div class="footer-section page-section positioned">
+                <div style="left: 0px; right: 0px; bottom: 0px;" class="design-element element-size-box footer-element section-element last-section is-page-child">
+                <section class="html-element">
+                             
+                                        <div class="rich-text-content">
+                                            <div style="text-align: center;">Email-2-SMS</div>
+                                            <div style="text-align: center;">TEL(1) 669-254-8427</div>
+                                            <div style="text-align: center;">TEL(2) 669-254-6309</div>
+                                            <div style="text-align: center;">TEL(3) 510-406-7086</div>
+                                          </div>
+                 
+                  </section>
+              </div>
+              </div>
+          </div>
+          </div>
+      </div>
+      </div>
+  </div>
+  </div>
+
+</html>
